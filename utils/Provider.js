@@ -11,19 +11,22 @@ export const connectPassport = () => {
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
       },
       async function (accessToken, refreshToken, profile, done) {
+        // Instead of searching for googleId, you can use the email for linking
         const user = await User.findOne({
-          googleId: profile.id,
+          email: profile.emails[0].value,
         });
 
         if (!user) {
+          // If the user doesn't exist, create a new user
           const newUser = await User.create({
-            googleId: profile.id,
             name: profile.displayName,
             photo: profile.photos[0].value,
+            email: profile.emails[0].value, // Use the email for linking
           });
 
           return done(null, newUser);
         } else {
+          // If the user already exists, simply return the user
           return done(null, user);
         }
       }

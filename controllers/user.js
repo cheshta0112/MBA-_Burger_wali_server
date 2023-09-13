@@ -1,8 +1,10 @@
 import { asyncError } from "../middlewares/errorMiddleware.js";
 import { User } from "../models/User.js";
 import { Order } from "../models/Order.js";
+import passport from "passport";
 
 export const myProfile = (req, res, next) => {
+  console.log("my profile");
   res.status(200).json({
     success: true,
     user: req.user,
@@ -10,6 +12,7 @@ export const myProfile = (req, res, next) => {
 };
 
 export const logout = (req, res, next) => {
+  console.log(req);
   req.session.destroy((err) => {
     if (err) return next(err);
     res.clearCookie("connect.sid", {
@@ -57,3 +60,50 @@ export const getAdminStats = asyncError(async (req, res, next) => {
     totalIncome,
   });
 });
+
+// // // Controller for handling user login
+// export const loginUser = (req, res, next) => {
+//   passport.authenticate("local", (err, user, info) => {
+//     if (err) {
+//       return next(err);
+//     }
+
+//     if (!user) {
+//       return res.status(401).json({ message: "Authentication failed" });
+//     }
+
+//     // If authentication succeeded, log in the user and redirect to /me
+//     req.logIn(user, (loginErr) => {
+//       if (loginErr) {
+//         return next(loginErr);
+//       }
+
+//       // Redirect to /me upon successful login
+//       return res.redirect("/me");
+//     });
+//   })(req, res, next);
+// };
+
+export const signUp = async (req, res, next) => {
+  try {
+    // Extract user data from the request body
+    const { name, email, password } = req.body;
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already registered" });
+    }
+
+    const newUser = new User({ name, email, password });
+
+    newUser.save();
+
+    // res.redirect("/api/v1/sign-in");
+    res
+      .status(201)
+      .json({ success: true, message: "User registered successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

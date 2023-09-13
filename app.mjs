@@ -6,6 +6,11 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import cors from "cors";
+import passportLocal from "./utils/passport-local.js";
+
+// Importing Routes
+import userRoute from "./routes/user.js";
+import orderRoute from "./routes/order.js";
 
 const app = express();
 export default app;
@@ -13,7 +18,6 @@ dotenv.config({
   path: "./config/config.env",
 });
 
-// Using Middlewares
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -27,6 +31,15 @@ app.use(
     },
   })
 );
+
+app.use(passport.authenticate("session"));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.enable("trust proxy");
+
+connectPassport();
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -42,17 +55,6 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
-
-app.use(passport.authenticate("session"));
-app.use(passport.initialize());
-app.use(passport.session());
-app.enable("trust proxy");
-
-connectPassport();
-
-// Importing Routes
-import userRoute from "./routes/user.js";
-import orderRoute from "./routes/order.js";
 
 app.use("/api/v1", userRoute);
 app.use("/api/v1", orderRoute);

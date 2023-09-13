@@ -5,7 +5,9 @@ import {
   getAdminUsers,
   logout,
   myProfile,
+  signUp,
 } from "../controllers/user.js";
+
 import { authorizeAdmin, isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
@@ -23,6 +25,19 @@ router.get(
     successRedirect: process.env.FRONTEND_URL,
   })
 );
+
+router.post("/sign-up", signUp);
+
+router.get(
+  "/sign-in",
+  passport.authenticate("local", {
+    successRedirect: "/api/v1/me",
+    failureRedirect: "/",
+    failureMessage: true,
+  })
+);
+
+// router.get("/sign-in", (req, res) => console.log("hello"));
 
 router.get("/me", isAuthenticated, myProfile);
 

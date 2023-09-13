@@ -3,17 +3,21 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
   name: String,
   photo: String,
-  googleId: {
+
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    default: "user",
+  },
+  email: {
     type: String,
     required: true,
     unique: true,
   },
-  role: {
-    type: "String",
-    enum: ["admin", "user"],
-    default: "user",
+  password: {
+    type: String,
+    required: true,
   },
-
   createdAt: {
     type: Date,
     default: Date.now,
