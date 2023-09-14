@@ -1,7 +1,5 @@
 import passport from "passport";
-
 import { Strategy, ExtractJwt } from "passport-jwt";
-
 import { User } from "../models/User.js";
 
 var opts = {};

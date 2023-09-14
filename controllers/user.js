@@ -12,18 +12,27 @@ export const myProfile = (req, res, next) => {
   });
 };
 
-export const logout = (req, res, next) => {
-  console.log(req);
-  req.session.destroy((err) => {
-    if (err) return next(err);
-    res.clearCookie("connect.sid", {
-      secure: process.env.NODE_ENV === "development" ? false : true,
-      httpOnly: process.env.NODE_ENV === "development" ? false : true,
-      sameSite: process.env.NODE_ENV === "development" ? false : "none",
-    });
-    res.status(200).json({
-      message: "Logged Out",
-    });
+// export const logout = (req, res, next) => {
+//   console.log(req);
+//   req.session.destroy((err) => {
+//     if (err) return next(err);
+//     res.clearCookie("connect.sid", {
+//       secure: process.env.NODE_ENV === "development" ? false : true,
+//       httpOnly: process.env.NODE_ENV === "development" ? false : true,
+//       sameSite: process.env.NODE_ENV === "development" ? false : "none",
+//     });
+//     res.status(200).json({
+//       message: "Logged Out",
+//     });
+//   });
+// };
+
+export const logout = (req, res) => {
+  // In a JWT-based authentication system, logging out is done on the client side by removing the token
+  // You can choose to implement this logic on the client side, such as clearing the token from local storage or cookies
+  // The server doesn't need to do anything specific for logout
+  res.status(200).json({
+    message: "Logged Out",
   });
 };
 
@@ -107,7 +116,7 @@ export const signUp = async (req, res, next) => {
     // Only include the userId in the payload
     const payload = {
       userId: newUser._id,
-      role: user.role,
+      role: newUser.role,
       // Include any other relevant user data here
     };
 
