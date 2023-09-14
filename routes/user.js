@@ -29,6 +29,15 @@ router.get(
   })
 );
 
+router.post(
+  "/logging",
+  passport.authenticate("jwt", { session: false }),
+  function (req, res) {
+    // Send a JSON response indicating a successful login
+    res.status(200).json({ success: true, message: "Login successful" });
+  }
+);
+
 router.post("/sign-up", signUp);
 
 router.post("/sign-in", async (req, res, next) => {
