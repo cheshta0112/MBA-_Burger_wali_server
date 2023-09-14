@@ -2,6 +2,7 @@ import { asyncError } from "../middlewares/errorMiddleware.js";
 import { User } from "../models/User.js";
 import { Order } from "../models/Order.js";
 import passport from "passport";
+import jwt from "jsonwebtoken";
 
 export const myProfile = (req, res, next) => {
   console.log("my profile");
@@ -33,6 +34,7 @@ export const getAdminUsers = asyncError(async (req, res, next) => {
     users,
   });
 });
+
 export const getAdminStats = asyncError(async (req, res, next) => {
   const usersCount = await User.countDocuments();
 
@@ -97,12 +99,22 @@ export const signUp = async (req, res, next) => {
 
     const newUser = new User({ name, email, password });
 
-    newUser.save();
+    await newUser.save();
 
-    // res.redirect("/api/v1/sign-in");
+    // Create a JWT token for the newly registered user
+    const secretKey = "mbaburgerwali";
+
+    // Only include the userId in the payload
+    const payload = {
+      userId: newUser._id,
+      role: user.role,
+      // Include any other relevant user data here
+    };
+
+    const token = jwt.sign(payload, secretKey, { expiresIn: "100000" });
     res
       .status(201)
-      .json({ success: true, message: "User registered successfully" });
+      .json({ success: true, message: "User registered successfully", token });
   } catch (error) {
     next(error);
   }

@@ -7,6 +7,9 @@ import {
   myProfile,
   signUp,
 } from "../controllers/user.js";
+import jwt from "jsonwebtoken";
+import ErrorHandler from "../utils/ErrorHandler.js";
+import { User } from "../models/User.js";
 
 import { authorizeAdmin, isAuthenticated } from "../middlewares/auth.js";
 
@@ -28,16 +31,29 @@ router.get(
 
 router.post("/sign-up", signUp);
 
-router.get(
-  "/sign-in",
-  passport.authenticate("local", {
-    successRedirect: "/api/v1/me",
-    failureRedirect: "/",
-    failureMessage: true,
-  })
-);
+router.post("/sign-in", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-// router.get("/sign-in", (req, res) => console.log("hello"));
+    if (!user || user.password !== password) {
+      return next(new ErrorHandler("Invalid credentials", 401));
+    }
+
+    // If authentication is successful, create a JWT token
+    const secretKey = "mbaburgerwali";
+    const payload = {
+      userId: user._id,
+      role: user.role,
+    };
+
+    const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+
+    res.json({ success: true, token });
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get("/me", isAuthenticated, myProfile);
 

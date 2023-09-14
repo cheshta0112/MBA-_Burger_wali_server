@@ -7,7 +7,8 @@ import passport from "passport";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import cors from "cors";
 import passportLocal from "./utils/passport-local.js";
-
+// import passportJWT from "./config/passport-jwt-strategy.js";
+import "./config/passport-jwt-strategy.js";
 // Importing Routes
 import userRoute from "./routes/user.js";
 import orderRoute from "./routes/order.js";
